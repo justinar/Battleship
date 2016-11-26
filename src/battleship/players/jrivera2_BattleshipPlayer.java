@@ -153,7 +153,7 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
 
         sunk();
         rounds++;
-        print();
+        //print();
     }
 
     /**

@@ -8,41 +8,12 @@ public class HumanVComputer {
     public static void main(String args[]) {
 
         //java.util.Scanner input = new java.util.Scanner(System.in);
-
         System.out.println("Welcome to Battleship!");
-        /*
-        Board humanBoard = null;
-        boolean validBoard = false;
-        while (!validBoard) {
-            char [][] humanMap = new char[10][10];
-            for (int i=0; i<10; i++) {
-                for (int j=0; j<10; j++) {
-                    humanMap[i][j] = ' ';
-                }
-            }
 
-            placeShip("Battleship", humanMap);
-            placeShip("Aircraft Carrier", humanMap);
-            placeShip("Destroyer", humanMap);
-            placeShip("Submarine", humanMap);
-            placeShip("Patrol Boat", humanMap);
-            try {
-                humanBoard = new Board(humanMap);
-                validBoard = true;
-            } catch (Exception e) {
-                System.out.println("I don't like your board.");
-            }
-        }
-
-        System.out.println("Here is your board!");
-        System.out.println(humanBoard);
-         */
         BattleshipPlayer self = new jrivera2_BattleshipPlayer();
+        BattleshipPlayer comp = new dumb_BattleshipPlayer();
 
         Board ownBoard = self.hideShips();
-        System.out.println("Here's your board, human:\n" + ownBoard);
-
-        BattleshipPlayer comp = new dumb_BattleshipPlayer();
 
         Board computerBoard = comp.hideShips();
 
@@ -64,7 +35,7 @@ public class HumanVComputer {
             //computerBoard.fireAt(firedRow, firedCol);
             self.go(computerBoard);
             comp.go(ownBoard);
-/*
+            /*
             System.out.println("Here's your board, human:\n" + ownBoard);
             /*
             System.out.println("Here's its board, as far as you know:");
@@ -76,12 +47,12 @@ public class HumanVComputer {
                 }
                 System.out.println();
             }
-*/
+             */
         }
         self.reset();
 
     }
-/*
+    /*
     static void placeShip(String shipName, char humanMap[][]) {
 
         java.util.Scanner input = new java.util.Scanner(System.in);
@@ -175,5 +146,5 @@ public class HumanVComputer {
             System.out.println();
         }
     }
-*/
+     */
 }
