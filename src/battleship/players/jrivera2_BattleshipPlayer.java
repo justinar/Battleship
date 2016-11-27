@@ -163,22 +163,25 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
      */
     public void reset() {
         int count = 0;
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                //move boards
-                if (lastestBoard[i][j] != 0) {
-                    oldBoards[i][j]++;
+        try {
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    //move boards
+                    if (lastestBoard[i][j] != 0) {
+                        oldBoards[i][j]++;
+                    }
+                    //find where I was shot
+                    if (mien.toString().charAt(count) == '\u25ae') {
+                        pastShot[i][j]++;
+                    }
+                    count++;
                 }
-                //find where I was shot
-                if (mien.toString().charAt(count) == '\u25ae') {
-                    pastShot[i][j]++;
-                }
-                count++;
             }
+        } catch (Exception e) {
         }
         copy(lastBoard, lastestBoard);
         copy(currentBoard, lastBoard);
-        print();
+        //print();
         rounds = 0;
     }
 //Diagnosticy thingy
@@ -265,14 +268,14 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
                             shot[1] = j;
                         }
                     }
-                    if (j < 10&&j>0) {
+                    if (j < 10 && j > 0) {
                         if (currentCharBoard[i][j + 1] < 33
-                                &&currentCharBoard[i][j - 1] >64) {
+                                && currentCharBoard[i][j - 1] > 64) {
                             shot[0] = i;
                             shot[1] = j + 1;
                         }
                         if (currentCharBoard[i][j - 1] < 33
-                                &&currentCharBoard[i][j + 1] >64) {
+                                && currentCharBoard[i][j + 1] > 64) {
                             shot[0] = i;
                             shot[1] = j - 1;
                         }
