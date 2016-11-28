@@ -117,35 +117,20 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
      * as cheating.
      */
     public void go(Board opponentsBoard) {
-        int[] shot = new int[2];
-        //shoot 4 corners and middle, wastes 5 turns but sets a baseline
-        switch (rounds) {
-            case 0:
-                shot[0] = 0;
-                shot[1] = 0;
-                break;
-            case 1:
-                shot[0] = 9;
-                shot[1] = 9;
-                break;
-            case 2:
-                shot[0] = 0;
-                shot[1] = 9;
-                break;
-            case 3:
-                shot[0] = 9;
-                shot[1] = 0;
-                break;
-            case 4:
-                shot[0] = 5;
-                shot[1] = 5;
-                break;
-            default:
+        //print();
+        int[] shot;
+        if (rounds < 4) {
+            shot = randFire();
+            while (currentCharBoard[shot[0]][shot[1]] != 0
+                    && currentCharBoard[shot[0]][shot[1]] != 32) {
+                shot = randFire();
+            }
+        } else {
+            shot = fire();
+            while (currentCharBoard[shot[0]][shot[1]] != 0
+                    && currentCharBoard[shot[0]][shot[1]] != 32) {
                 shot = fire();
-                while (currentCharBoard[shot[0]][shot[1]] != ' ') {
-                    shot = fire();
-                }
-                break;
+            }
         }
         char temp = opponentsBoard.fireAt(shot[0], shot[1]);
         currentCharBoard[shot[0]][shot[1]] = (temp == ' ' ? '.' : temp);
@@ -205,36 +190,40 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
         }
         System.out.println(rounds);
     }
-//Burn baby, burn
 
-    private int[] fire() {
+    //Random burn
+    private int[] randFire() {
         int[] shot = new int[2];
-        int row = rng.nextInt(10);
+        int row =/* rounds%10;*/rng.nextInt(10);
         shot[0] = row;
-        shot[1] = (fallBack[row][rng.nextInt(5)]);
+        shot[1] = /*rounds/10;*/(fallBack[row][rng.nextInt(5)]);
+        return shot;
+    }
+
+//Burn baby, burn
+    private int[] fire() {
+        int[] shot = randFire();
+        
         for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 9; j++) {
-                if ((oldBoards[i][j] + lastestBoard[i][j]) > (oldBoards[i][j + 1] + lastestBoard[i][j + 1])) {
+            for (int j = 0; j < 10; j++) {
+                if ((oldBoards[i][j] + lastestBoard[i][j]) > (oldBoards[shot[0]][shot[1]] + lastestBoard[shot[0]][shot[1]])) {
                     shot[0] = i;
                     shot[1] = j;
                 }
-                if ((oldBoards[j][i] + lastestBoard[j][i]) > (oldBoards[j + 1][i] + lastestBoard[j + 1][i])) {
-                    shot[0] = j;
-                    shot[1] = i;
-                }
             }
         }
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
                 //if there are any letters uncovered, shoot around them
+                //*
                 if (currentCharBoard[i][j] > 64) {
-                    if (i < 10) {
+                    if (i < 9) {
                         if (currentCharBoard[i + 1][j] < 33) {
                             shot[0] = i + 1;
                             shot[1] = j;
                         }
                     }
-                    if (j < 10) {
+                    if (j < 9) {
                         if (currentCharBoard[i][j + 1] < 33) {
                             shot[0] = i;
                             shot[1] = j + 1;
@@ -253,7 +242,7 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
                         }
 
                     }
-                }
+                }//*
                 //make it go in a line
                 if (currentCharBoard[i][j] > 64) {
                     if (i < 10 && i > 0) {
@@ -280,7 +269,7 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
                             shot[1] = j - 1;
                         }
                     }
-                }
+                }//*/
             }
         }
         return shot;
@@ -400,8 +389,12 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
                 best = i;
             }
         }
-        int[][] loc = valid.get(best);
-        return loc;
+        try {
+            int[][] loc = valid.get(best);
+            return loc;
+        } catch (Exception e) {
+            return setLoc(findRandLoc(), length);
+        }
     }
 
     private int sum(int[][] arr) {

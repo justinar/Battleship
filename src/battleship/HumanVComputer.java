@@ -17,31 +17,27 @@ public class HumanVComputer {
         int ai = 0;
 
         for (int z = 0; z < 2; z++) {
+            self.reset();
+            comp.reset();
 
             Board ownBoard = self.hideShips();
-
             Board computerBoard = comp.hideShips();
-
-            char[][] computerMap = new char[10][10];
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    computerMap[i][j] = '.';
-                }
-            }
-
+            
             while (!ownBoard.isComplete() && !computerBoard.isComplete()) {
                 computerBoard.firedAtThisRound = false;
                 ownBoard.firedAtThisRound = false;
+                
                 self.go(computerBoard);
                 comp.go(ownBoard);
             }
+
             if (ownBoard.isComplete()) {
                 System.out.println(++ai);
             } else {
                 System.out.println(++human);
             }
-            self.reset();
         }
-        System.out.printf("You won %d games%nThe AI won %d games%n",human,ai);
+
+        System.out.printf("You won %d games%nThe AI won %d games%n", human, ai);
     }
 }
