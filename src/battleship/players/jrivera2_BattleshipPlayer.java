@@ -117,24 +117,25 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
      * as cheating.
      */
     public void go(Board opponentsBoard) {
-        //print();
         int[] shot;
-        if (rounds < 4) {
+        if (rounds < 1) {
             shot = randFire();
-            while (currentCharBoard[shot[0]][shot[1]] != 0
-                    && currentCharBoard[shot[0]][shot[1]] != 32) {
+            while (currentCharBoard[shot[0]][shot[1]] == 42
+                    && currentCharBoard[shot[0]][shot[1]] > 64) {
                 shot = randFire();
             }
         } else {
             shot = fire();
-            while (currentCharBoard[shot[0]][shot[1]] != 0
-                    && currentCharBoard[shot[0]][shot[1]] != 32) {
+            while (currentCharBoard[shot[0]][shot[1]] == 42
+                    || currentCharBoard[shot[0]][shot[1]] > 64) {
                 shot = fire();
             }
         }
         char temp = opponentsBoard.fireAt(shot[0], shot[1]);
-        currentCharBoard[shot[0]][shot[1]] = (temp == ' ' ? '.' : temp);
-        currentBoard[shot[0]][shot[1]] = 1;
+        currentCharBoard[shot[0]][shot[1]] = (temp == 32 ? 46 : temp);
+        if (currentCharBoard[shot[0]][shot[1]] != 46) {
+            currentBoard[shot[0]][shot[1]] = 1;
+        }
 
         sunk();
         rounds++;
@@ -158,6 +159,11 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
                     //find where I was shot
                     if (mien.toString().charAt(count) == '\u25ae') {
                         pastShot[i][j]++;
+                    } else if (mien.toString().charAt(count) == 10) {
+                        count++;
+                        if (mien.toString().charAt(count) == '\u25ae') {
+                            pastShot[i][j]++;
+                        }
                     }
                     count++;
                 }
@@ -169,7 +175,7 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
         //print();
         rounds = 0;
     }
-//Diagnosticy thingy
+    //Diagnosticy thingy
 
     private void print() {
         System.out.println("Here's your board:\n" + mien);
@@ -182,9 +188,17 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
             }
             System.out.println();
         }
+        System.out.println("Here are it's past shots");
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 System.out.print(pastShot[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println("Here are it's old board");
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                System.out.print(oldBoards[i][j]);
             }
             System.out.println();
         }
@@ -194,85 +208,51 @@ public class jrivera2_BattleshipPlayer implements BattleshipPlayer {
     //Random burn
     private int[] randFire() {
         int[] shot = new int[2];
-        int row =/* rounds%10;*/rng.nextInt(10);
+        int row = rng.nextInt(10);
         shot[0] = row;
-        shot[1] = /*rounds/10;*/(fallBack[row][rng.nextInt(5)]);
+        shot[1] =rng.nextInt(10);
         return shot;
     }
 
 //Burn baby, burn
     private int[] fire() {
-        int[] shot = randFire();
-        
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if ((oldBoards[i][j] + lastestBoard[i][j]) > (oldBoards[shot[0]][shot[1]] + lastestBoard[shot[0]][shot[1]])) {
-                    shot[0] = i;
-                    shot[1] = j;
+        ArrayList<int[]> bestShot = new ArrayList<>();
+
+        bestShot.add(randFire());
+        while (currentCharBoard[bestShot.get(0)[0]][bestShot.get(0)[1]] == 42
+                && currentCharBoard[bestShot.get(0)[0]][bestShot.get(0)[1]] > 64) {
+            bestShot.set(0, randFire());
+        }
+
+        int rnd[][] = findRandLoc();
+
+        ArrayList<int[]> potentialShot = new ArrayList<>();
+
+        for (int i = 0; i < rnd.length; i++) {
+            if (currentCharBoard[rnd[i][0]][rnd[i][1]] < 35) {
+                potentialShot.add(rnd[i]);
+            }
+        }
+
+        while (potentialShot.isEmpty()) {
+            rnd = findRandLoc();
+            for (int i = 0; i < rnd.length; i++) {
+                if (currentCharBoard[rnd[i][0]][rnd[i][1]] < 35) {
+                    potentialShot.add(rnd[i]);
                 }
             }
         }
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                //if there are any letters uncovered, shoot around them
-                //*
-                if (currentCharBoard[i][j] > 64) {
-                    if (i < 9) {
-                        if (currentCharBoard[i + 1][j] < 33) {
-                            shot[0] = i + 1;
-                            shot[1] = j;
-                        }
-                    }
-                    if (j < 9) {
-                        if (currentCharBoard[i][j + 1] < 33) {
-                            shot[0] = i;
-                            shot[1] = j + 1;
-                        }
-                    }
-                    if (i > 0) {
-                        if (currentCharBoard[i - 1][j] < 33) {
-                            shot[0] = i - 1;
-                            shot[1] = j;
-                        }
-                    }
-                    if (j > 0) {
-                        if (currentCharBoard[i][j - 1] < 33) {
-                            shot[0] = i;
-                            shot[1] = j - 1;
-                        }
 
-                    }
-                }//*
-                //make it go in a line
-                if (currentCharBoard[i][j] > 64) {
-                    if (i < 10 && i > 0) {
-                        if (currentCharBoard[i + 1][j] < 33
-                                && currentCharBoard[i - 1][j] > 64) {
-                            shot[0] = i + 1;
-                            shot[1] = j;
-                        }
-                        if (currentCharBoard[i - 1][j] < 33
-                                && currentCharBoard[i + 1][j] > 64) {
-                            shot[0] = i - 1;
-                            shot[1] = j;
-                        }
-                    }
-                    if (j < 10 && j > 0) {
-                        if (currentCharBoard[i][j + 1] < 33
-                                && currentCharBoard[i][j - 1] > 64) {
-                            shot[0] = i;
-                            shot[1] = j + 1;
-                        }
-                        if (currentCharBoard[i][j - 1] < 33
-                                && currentCharBoard[i][j + 1] > 64) {
-                            shot[0] = i;
-                            shot[1] = j - 1;
-                        }
-                    }
-                }//*/
+        for (int i = 0; i < potentialShot.size(); i++) {
+            int r = potentialShot.get(i)[0];
+            int c = potentialShot.get(i)[1];
+            int nr = bestShot.get(0)[0];
+            int nc = bestShot.get(0)[0];
+            if (lastestBoard[r][c]*2+oldBoards[r][c]>lastestBoard[nr][nc]*2+oldBoards[nr][nc]) {
+                bestShot.add(0,potentialShot.get(i));
             }
         }
-        return shot;
+        return bestShot.get(0);
     }
 
     private void fill(int[][] arr) {

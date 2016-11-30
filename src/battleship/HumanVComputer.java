@@ -16,7 +16,7 @@ public class HumanVComputer {
         int human = 0;
         int ai = 0;
 
-        for (int z = 0; z < 2; z++) {
+        for (int z = 0; z < 200000; z++) {
             self.reset();
             comp.reset();
 
